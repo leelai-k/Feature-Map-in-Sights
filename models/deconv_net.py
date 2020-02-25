@@ -13,9 +13,21 @@ class CustomDeconvNet(nn.Module):
         deconv_model = self.get_deconv_model(model)
         self.features = deconv_model._modules["features"]
         self.vgg_reverse_mapping = [x for x in range(31)]
-        self.alex_reverse_mapping = [x for x in range(13)]
 
     def get_deconv_model(self, model):
+        """
+        Construct transpose Convolutional network by reversing
+        input Convolutional network blocks and replacing them with the
+        corresponding Deconvolution network blocks and copying weights.
+        
+        Ignore classifier blocks.
+        Blocks:
+        Conv -> Deconv
+        Conv2d -> ConvTranspose2d
+        MaxPool2d -> MaxUnpool2d 
+            (Must pass in saved indices of max activation from ConvNet.)
+        ReLU -> ReLU
+        """
         if model._modules == OrderedDict():
             return None
         reverse_order_dict = OrderedDict()

@@ -12,12 +12,16 @@ class CustomConvNet(nn.Module):
         
         conv_model = self.get_conv_model(model)
         self.features = conv_model._modules["features"]
-        self.classifier = conv_model._modules["classifier"]
 
         self.feature_maps = OrderedDict()
         self.pooling_spots = OrderedDict()
 
     def get_conv_model(self, model):
+        """
+        Copy input convolutional model in a nested manner. 
+        Ensure MaxPool2d block saves off indices of max activations,
+        so it can be used by the corresponding MaxUnpool2d block in Deconv net.
+        """
         if model._modules == OrderedDict():
             return None
         new_conv_dict = OrderedDict()
@@ -46,6 +50,3 @@ class CustomConvNet(nn.Module):
             else:
                 x = layer(x)
         return x
-
-    def validate_model_compatibility(self, model):
-        pass

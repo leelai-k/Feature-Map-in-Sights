@@ -10,7 +10,10 @@ inputs=(
 	tiger
 	wolf)
 
+# For all input images, generate and save deconv visualizations gifs.
+# Feature Map Controls: 
+# Activation fixed as %100 
+# Feature maps varied from one to all feature maps. 
 for i in "${inputs[@]}"; do
-  mkdir "results/gifs/${i}_gifs"
-  python visualize_main.py images/"${i}".jpeg -g -gdir "${i}_gifs"
+  python visualize_main.py images/"${i}".jpeg -gif -out "${i}"
 done
