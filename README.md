@@ -5,20 +5,19 @@ Core implementation based on: [Zeiler M., Fergus R. Visualizing and Understandin
 
 ## VISUALIZATION MODES
 #### IMAGE
->  python visualize_main.py images/tiger.jpeg -out defaults/car_vis_default -m 0.2 -a 9
+>  python visualize_main.py images/car.jpeg -out all_maps_all_activations/car_vis_100_np_100_ap -m 1.0 -a 1.0
 
-![Image_Vis](results/images/all_maps_all_activation/car_vis_100_np_100_ap.jpeg)
-Visualize the top 9 activations for the top %20 of feature map(s) in each layer of a CNN for the input image "images/tiger.jpeg" and save result at "defaults/tiger_vis_default".
-
+Visualize all activations for all feature map(s) in each layer of a CNN for the input image "images/car.jpeg" and save result at "all_maps_all_activations/car_vis_100_np_100_ap.jpeg".
+![Image_Vis](results/images/all_maps_all_activations/car_vis_100_np_100_ap.jpeg)
 
 
 #### GIF
 >  python visualize_main.py images/tiger.jpeg --gif -out tiger
 
-![GIF_Vis](results/gifs/tiger.gif)
 Visualize projections of all activations for a set of feature map(s) from each layer to input space. GIF progresses from visualization of a single feature map to the top 64 feature maps in a layer. 
 
 **Note:** Grid is sorted from first layer to last layer.
+![GIF_Vis](results/gifs/tiger.gif)
 
 ## EXAMPLES
 Pre-generated examples for 10 sample images. Generated using the mentioned shell scripts.
