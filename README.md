@@ -8,7 +8,7 @@ Core implementation based on: [Zeiler M., Fergus R. Visualizing and Understandin
 >  python visualize_main.py images/car.jpeg -out all_maps_all_activations/car_vis_100_np_100_ap -m 1.0 -a 1.0
 
 Visualize all activations for all feature map(s) in each layer of a CNN for the input image "images/car.jpeg" and save result at "all_maps_all_activations/car_vis_100_np_100_ap.jpeg".
-![Image_Vis](results/images/all_maps_all_activations/car_vis_100_np_100_ap.jpeg)
+![Image_Vis](results/images/all_maps_all_activations/car_vis_100_mp_100_ap.jpeg)
 
 
 #### GIF
