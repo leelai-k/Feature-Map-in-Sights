@@ -11,9 +11,13 @@ inputs=(
 	wolf)
 
 for i in "${inputs[@]}"; do
-  python visualize_main.py images/"${i}".jpeg -out defaults/"${i}"_vis_default -m 0 -a 0
-  python visualize_main.py images/"${i}".jpeg -out all_maps/"${i}"_vis_100_mp -a 0
-  python visualize_main.py images/"${i}".jpeg -out all_activations/"${i}"_vis_100_ap -m 0
-  python visualize_main.py images/"${i}".jpeg -out all_maps_all_activations/"${i}"_vis_100_np_100_ap 
+  # Single Activation Single Map
+  python visualize_main.py images/"${i}".jpeg -out defaults/"${i}"_vis_default --maps 0 --activations 0
+  # Single Activation All Maps
+  python visualize_main.py images/"${i}".jpeg -out all_maps/"${i}"_vis_100_mp --activations 0
+  # All Activations Single Map
+  python visualize_main.py images/"${i}".jpeg -out all_activations/"${i}"_vis_100_ap --maps 0
+  # All Activations All Maps
+  python visualize_main.py images/"${i}".jpeg -out all_maps_all_activations/"${i}"_vis_100_mp_100_ap 
   
 done

@@ -2,6 +2,7 @@ import argparse
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import time
 import torch
 import torch.nn as nn
 import torchvision
@@ -10,6 +11,7 @@ import torchvision.transforms as transforms
 from image_utils import load_image, normalize_img, postprocess_img_for_gif, save_image_visualization, show_image
 from models import CustomConvNet
 from models import CustomDeconvNet
+from multiprocessing import Pool
 from functools import partial
 from PIL import Image
 
@@ -23,6 +25,7 @@ def main():
     VISUALIZATION TYPE(gif or grid), 
     FEATURE_MAP_CONTROLS(activations and maps) 
     """
+    start = time.time()
     parser = argparse.ArgumentParser(description='Visualize which sections of image activate feature maps.')
     parser.add_argument('img_path', 
                         action="store", 
@@ -72,7 +75,7 @@ def main():
     output_path = args.img_path.split(".")[0].split("/")[-1]
     if args.output_path:
         output_path = args.output_path.split(".")[0]
-    plt.figure(num=None, figsize=(16, 12), dpi=2000)
+    plt.figure(num=None, figsize=(8, 6), dpi=200)
     img, orig_img = load_image(args.img_path, int(args.layer) in vgg16_conv_layers)
 
     if args.gif:
@@ -84,8 +87,10 @@ def main():
             visualize_single_layer_in_image(img, int(args.layer), (float(args.act_var), float(args.map_var)))
             save_image_visualization(output_path, args.layer)
         else:
-            visualize_image(img, (float(args.act_var), float(args.map_var)))
+            visualize_image(img, (float(args.map_var), float(args.act_var)))
             save_image_visualization(output_path)
+    end = time.time()
+    print(end - start)
 
 def get_conv_nets():
     """
@@ -171,17 +176,29 @@ def choose_maps_by_max_activations(maps, feature_map_controls):
         chosen_map_count = int(map_var * num_maps)
     print str.format("{}/{} Feature Maps", chosen_map_count, num_maps)
 
-    included_feature_maps = np.array([
-        torch.max(maps[0, i, :, :]).item() 
-        for i in range(0, num_maps)]).argsort()[-chosen_map_count:]
+    included_feature_maps = []
+    if chosen_map_count < num_maps:
+        included_feature_maps = torch.tensor([
+            torch.max(maps[0, i, :, :]).item() 
+            for i in range(0, num_maps)]).topk(chosen_map_count)[1][:chosen_map_count]
+    else:
+        included_feature_maps = range(0, num_maps)
 
+    use_multiprocess = len(included_feature_maps) > 1
+
+    pool = Pool(processes=16)
     for i in range(0, num_maps):
         if i not in included_feature_maps:
             maps[:, i, :, :] = 0
         else:
-            maps[0, i] = select_feature_map_activations(
+            if use_multiprocess and feature_map_controls[1] != 1:
+                pool.apply_async(select_feature_map_activations, (maps[0, i], feature_map_controls[1]))
+            else:
+                maps[0, i] = select_feature_map_activations(
                             maps[0, i], 
                             feature_map_controls[1])
+    pool.close()
+    pool.join()
     return maps
 
 def visualize_image_as_gif(img, output_path):
@@ -317,30 +334,26 @@ def select_feature_map_activations(feature_map, activation_control):
         <feature_map> (TENSOR) Feature_maps to be preprocessed.
         <activation_control> (TUPLE) Controls how many activations will be selected per map.
     """
-    nonzero_inds = torch.nonzero(feature_map[:, :])
+    nonzero_inds = feature_map.nonzero()
+    empty = torch.zeros(feature_map.shape)
     chosen_activation_count = 1
     if activation_control > 1:
-        chosen_activation_count = int(activation_control) if nonzero_inds > activation_control else nonzero_inds
+        chosen_activation_count = int(activation_control) if len(nonzero_inds) > activation_control else len(nonzero_inds)
     elif activation_control == 1:
         return feature_map
     elif activation_control > 0:
         chosen_activation_count = int(activation_control * len(nonzero_inds))
+    if chosen_activation_count == len(nonzero_inds):
+        return feature_map
 
     if len(nonzero_inds) > 0:
-        act_lst = []
-
-        included_activations = torch.tensor([
+        activation_threshold = torch.tensor([
             feature_map[ind[0], ind[1]] 
-            for ind in nonzero_inds]).argsort()[-chosen_activation_count:]
-
-        activation_threshold = feature_map[
-                nonzero_inds[included_activations[0]][0], 
-                nonzero_inds[included_activations[0]][1]]
-
+            for ind in nonzero_inds]).topk(chosen_activation_count)[0][chosen_activation_count - 1]
         feature_map = torch.where(
             feature_map >= activation_threshold,
-            feature_map[:, :],
-            torch.zeros(feature_map[:, :].shape))
+            feature_map,
+            empty)
 
     return feature_map
 

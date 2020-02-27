@@ -67,6 +67,8 @@ def show_image(img, ind, title, width=4, height=4):
     Add image subplot at the specified index with given title.
     """
     plt.subplot(width, height, ind)
+    plt.axis('off')
     plt.title(title)
+    plt.tight_layout(pad=0.01)
     plt.imshow(np.transpose(img, (1, 2, 0)))
 
