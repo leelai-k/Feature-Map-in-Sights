@@ -5,9 +5,10 @@ Core implementation based on: [Zeiler M., Fergus R. Visualizing and Understandin
 
 ## VISUALIZATION MODES
 #### IMAGE
->  python visualize_main.py images/car.jpeg -out all_maps_all_activations/car_vis_100_np_100_ap -m 1.0 -a 1.0
+>  python visualize_main.py images/car.jpeg -out all_maps_all_activations/car_vis_100_np_100_ap --maps 1.0 --activations 1.0
 
-Visualize all activations for all feature map(s) in each layer of a CNN for the input image "images/car.jpeg" and save result at "all_maps_all_activations/car_vis_100_np_100_ap.jpeg".
+Visualizes all activations for all feature maps in each layer of a CNN for the input image "images/car.jpeg" and save result at "all_maps_all_activations/car_vis_100_np_100_ap.jpeg".
+
 ![Image_Vis](results/images/all_maps_all_activations/car_vis_100_mp_100_ap.jpeg)
 
 
@@ -21,11 +22,19 @@ Visualize projections of all activations for a set of feature map(s) from each l
 
 ## EXAMPLES
 Pre-generated examples for 10 sample images. Generated using the mentioned shell scripts.
-- **sample images :** \images
-- **sample gif_visualizations**: results\gifs
-	- generate_gifs_vis.sh
-- **sample image_visualizations**: results\images
-	- generate_image_vis.sh
+- **sample images :** /images
+- **sample gif_visualizations**: results/gifs
+	- Generated using generate_gifs_vis.sh
+	- Seperate visualization for each layer.
+	- Example GIFs proceed from (Top Feature Map, All Activations) -> (All Feature Maps, All Activations)
+- **sample image_visualizations**: results/images
+	- Generated using generate_image_vis.sh
+	- Seperate visualization for each layer.
+	- Examples for:
+		- Top Feature Map, Top Activation (/defaults)
+		- All Feature Maps, Top Activation (/all_maps)
+		- Top Feature Map, All Activations (/all_activations)
+		- All Feature Maps, All Activations (/all_maps_all_activations)
 
 ## USAGE
 **img_path** ==(req)== 
